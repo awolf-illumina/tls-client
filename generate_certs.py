@@ -2,6 +2,28 @@ import datetime
 import OpenSSL
 
 
+def binary_to_array_string(data):
+    output_string = "{ \\\n"
+
+    for i in range(0, len(data), 16):
+        chunk = data[i:i+16]
+        hex_values = ["0x{:02X}".format(b) for b in chunk]
+        output_string += "    " + ", ".join(hex_values) + ", \\\n"
+    output_string += "}"
+
+    return output_string
+
+
+def binary_to_file(filename, data_string, ifdef_name, symbol_name):
+    template_string = open("template_config.h", "r").read()
+    template_string = template_string.replace("{IFDEF}", ifdef_name)
+    template_string = template_string.replace("{SYMBOL_NAME}", symbol_name)
+    template_string = template_string.replace("{DATA}", data_string)
+
+    output_file = open(filename, "w")
+    output_file.write(template_string)
+    output_file.close()
+
 def main():
     # Generate Root Key Pair
     root_key_pair = OpenSSL.crypto.PKey()
@@ -60,6 +82,12 @@ def main():
     open('root_cert.pem', 'wb').write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, root_cert))
     open('host_key.pem', 'wb').write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, host_key_pair, passphrase=b'12345678'))
     open('host_cert.pem', 'wb').write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, host_cert))
+
+    cert_asn1 = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, host_cert)
+    key_asn1 = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_ASN1, host_key_pair)
+
+    binary_to_file("certificates_server_cert.h", binary_to_array_string(cert_asn1), "SERVER_CERT_H_", "SERVER_CERT")
+    binary_to_file("certificates_server_key.h", binary_to_array_string(key_asn1), "SERVER_KEY_H_", "SERVER_KEY")
 
 
 main()
