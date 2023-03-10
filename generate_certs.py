@@ -3,7 +3,7 @@ import OpenSSL
 import os
 
 
-OUTPUT_PATH = "C:/Users/awolf/dev/security-poc/tls-server/tls-server/source/certificates/"
+OUTPUT_PATH = "../tls-server/source/certificates/"
 ROOT_CERT_PATH = os.path.join(OUTPUT_PATH, "certificates_root_cert.h")
 SERVER_CERT_PATH = os.path.join(OUTPUT_PATH, "certificates_server_cert.h")
 SERVER_KEY_PATH = os.path.join(OUTPUT_PATH, "certificates_server_key.h")
@@ -99,8 +99,8 @@ def main():
 
     # Export for Client
     open('root_cert.pem', 'wb').write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, root_cert))
-    open('server_key.pem', 'wb').write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, server_key_pair))
-    open('server_cert.pem', 'wb').write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, server_cert))
+    open('client_key.pem', 'wb').write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, client_key_pair))
+    open('client_cert.pem', 'wb').write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, client_cert))
 
     # Export for Server
     root_cert_asn1 = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, root_cert)
